@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #0f0f0f;
+}
+
+audio::-webkit-media-controls-panel {
+  background: #1e1e1e;
+}
