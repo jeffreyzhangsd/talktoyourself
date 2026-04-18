@@ -2,6 +2,7 @@
 
 # Claude / AI tooling
 .claude/
+docs/superpowers/
 
 # dependencies
 /node_modules
