@@ -2,7 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 
-export default function CameraPreview() {
+type Props = {
+  onStreamChange: (stream: MediaStream | null) => void;
+  disabled?: boolean;
+};
+
+export default function CameraPreview({ onStreamChange, disabled }: Props) {
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -13,6 +18,7 @@ export default function CameraPreview() {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
       if (videoRef.current) videoRef.current.srcObject = null;
+      onStreamChange(null);
       return;
     }
 
@@ -22,16 +28,18 @@ export default function CameraPreview() {
         streamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
         setError(false);
+        onStreamChange(stream);
       })
       .catch(() => {
         setEnabled(false);
         setError(true);
+        onStreamChange(null);
       });
 
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
     };
-  }, [enabled]);
+  }, [enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!enabled) {
     return (
@@ -43,7 +51,8 @@ export default function CameraPreview() {
         )}
         <button
           onClick={() => setEnabled(true)}
-          className="text-xs text-[#555] hover:text-[#888] transition-colors py-6 px-4"
+          disabled={disabled}
+          className="text-xs text-[#555] py-6 px-4 disabled:opacity-30 disabled:cursor-not-allowed hover:text-[#888] disabled:hover:text-[#555] transition-colors"
         >
           📷 Enable camera
         </button>

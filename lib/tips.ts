@@ -38,7 +38,7 @@ export const TIPS: Tip[] = [
     body: "Mumbling and monotone go together. Speak louder than feels comfortable — it adds energy.",
   },
   {
-    title: "Daily reps beat long sessions",
-    body: "60 seconds every day compounds faster than an hour once a week. Show up consistently.",
+    title: "Practice daily — the payoff is real",
+    body: "Every rep trains your brain and mouth to work together. Show up consistently and you'll notice yourself speaking with more confidence, clarity, and ease in the conversations that matter.",
   },
 ];

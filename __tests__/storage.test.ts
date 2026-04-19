@@ -7,8 +7,6 @@ const makeRecording = (id: string): Recording => ({
   timestamp: 1000,
   duration: 45,
   blobUrl: `blob:${id}`,
-  fillerCount: 3,
-  transcript: "test transcript",
 });
 
 describe("storage", () => {

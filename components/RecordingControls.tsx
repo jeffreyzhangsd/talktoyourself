@@ -3,6 +3,7 @@ import type { RecorderState } from "@/lib/useRecorder";
 type Props = {
   state: RecorderState;
   elapsed: number;
+  canStop: boolean;
   onStart: () => Promise<void>;
   onStop: () => void;
 };
@@ -13,13 +14,18 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+const MIN_DURATION = 60;
+const MAX_DURATION = 120;
+
 export default function RecordingControls({
   state,
   elapsed,
+  canStop,
   onStart,
   onStop,
 }: Props) {
-  const progress = Math.min((elapsed / 60) * 100, 100);
+  const progress = Math.min((elapsed / MAX_DURATION) * 100, 100);
+  const minProgress = (MIN_DURATION / MAX_DURATION) * 100;
   const isRecording = state === "recording";
 
   return (
@@ -30,26 +36,40 @@ export default function RecordingControls({
         </div>
         <div className="text-xs text-[#555] tracking-widest mt-1">
           {isRecording
-            ? "RECORDING · 1:00 MAX"
+            ? canStop
+              ? "KEEP GOING!! STOP WHENEVER YOU FEEL LIKE IT"
+              : "RECORDING · KEEP GOING!!"
             : state === "stopped"
               ? "DONE"
               : "READY"}
         </div>
       </div>
 
-      <div className="h-1 bg-[#1e1e1e] rounded-full overflow-hidden">
+      <div className="relative h-1 bg-[#1e1e1e] rounded-full overflow-hidden">
         <div
           className="h-full bg-[#7c6fcd] rounded-full transition-all duration-1000"
           style={{ width: `${progress}%` }}
+        />
+        {/* 1 min minimum marker */}
+        <div
+          className="absolute top-0 bottom-0 w-px bg-[#444]"
+          style={{ left: `${minProgress}%` }}
         />
       </div>
 
       {isRecording ? (
         <button
-          onClick={onStop}
-          className="bg-[#1e1e1e] text-[#e05c5c] border border-[#e05c5c] rounded-lg py-2.5 text-sm font-semibold hover:bg-[#2a1a1a] transition"
+          onClick={canStop ? onStop : undefined}
+          disabled={!canStop}
+          className={`rounded-lg py-2.5 text-sm font-semibold border transition ${
+            canStop
+              ? "bg-[#1e1e1e] text-[#e05c5c] border-[#e05c5c] hover:bg-[#2a1a1a]"
+              : "bg-[#1e1e1e] text-[#444] border-[#2a2a2a] cursor-not-allowed"
+          }`}
         >
-          ■ Stop Recording
+          {canStop
+            ? "■ Stop Recording"
+            : `■ Stop (at ${formatTime(MIN_DURATION)})`}
         </button>
       ) : (
         <button

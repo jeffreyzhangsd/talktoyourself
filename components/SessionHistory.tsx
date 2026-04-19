@@ -25,8 +25,6 @@ function formatTime(seconds: number): string {
 export default function SessionHistory({ recordings, onPlay }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  if (recordings.length === 0) return null;
-
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -51,43 +49,64 @@ export default function SessionHistory({ recordings, onPlay }: Props) {
     <div className="flex flex-col gap-3">
       <div className="text-xs text-[#555] tracking-widest">THIS SESSION</div>
 
-      <div className="flex flex-wrap gap-2">
-        {recordings.map((r) => (
-          <button
-            key={r.id}
-            onClick={() => {
-              toggleSelect(r.id);
-              onPlay(r);
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs border transition ${
-              selected.has(r.id)
-                ? "border-[#7c6fcd] text-[#c0b8f0] bg-[#1a1830]"
-                : "border-[#2a2a2a] text-[#888] bg-[#1e1e1e] hover:border-[#444]"
-            }`}
-          >
-            <span>{selected.has(r.id) ? "☑" : "☐"}</span>
-            <span>
-              {formatChipDate(r.timestamp)} · {formatTime(r.duration)}
-            </span>
-          </button>
-        ))}
+      {recordings.length === 0 ? (
+        <p className="text-xs text-[#3a3a3a] italic">No recordings yet.</p>
+      ) : (
+        <p className="text-xs text-[#3a3a3a] italic">
+          Download to keep — recordings are lost on refresh.
+        </p>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {recordings.map((r) => {
+          const isSelected = selected.has(r.id);
+          return (
+            <div
+              key={r.id}
+              className={`flex items-center rounded-md text-xs border transition ${
+                isSelected
+                  ? "border-[#7c6fcd] text-[#c0b8f0] bg-[#1a1830]"
+                  : "border-[#2a2a2a] text-[#888] bg-[#1e1e1e]"
+              }`}
+            >
+              <button
+                onClick={() => toggleSelect(r.id)}
+                className="px-2 py-1.5 hover:opacity-70 transition-opacity"
+                aria-label={isSelected ? "Deselect" : "Select"}
+              >
+                {isSelected ? "☑" : "☐"}
+              </button>
+              <button
+                onClick={() => onPlay(r)}
+                className={`px-3 py-1.5 border-l transition hover:opacity-70 ${
+                  isSelected ? "border-[#7c6fcd]" : "border-[#2a2a2a]"
+                }`}
+              >
+                {formatChipDate(r.timestamp)} · {formatTime(r.duration)}
+                {r.hasVideo && <span className="ml-1 opacity-60">🎥</span>}
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={handleDownload}
-          disabled={selected.size === 0}
-          className="flex-1 py-2 rounded-lg text-xs font-semibold border border-[#2a2a2a] bg-[#1a1a1a] text-[#888] hover:border-[#444] disabled:opacity-30 disabled:cursor-not-allowed transition"
-        >
-          ⬇ Download Selected ({selected.size})
-        </button>
-        <button
-          onClick={() => onPlay(latest)}
-          className="flex-1 py-2 rounded-lg text-xs font-semibold bg-[#7c6fcd] text-white hover:bg-[#6a5ec0] transition"
-        >
-          ▶ Play Last
-        </button>
-      </div>
+      {recordings.length > 0 && (
+        <div className="flex flex-col gap-2 mt-1">
+          <button
+            onClick={() => onPlay(latest)}
+            className="w-full py-2 rounded-lg text-xs font-semibold bg-[#7c6fcd] text-white hover:bg-[#6a5ec0] transition"
+          >
+            ▶ Play Last
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={selected.size === 0}
+            className="w-full py-2 rounded-lg text-xs font-semibold border border-[#2a2a2a] bg-[#1a1a1a] text-[#888] hover:border-[#444] disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            ⬇ Download ({selected.size})
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { Recording } from "@/lib/types";
-import { getRecordings } from "@/lib/storage";
+import { getRecordings, clearRecordings } from "@/lib/storage";
 import { useRecorder } from "@/lib/useRecorder";
 import PromptBanner from "@/components/PromptBanner";
 import CameraPreview from "@/components/CameraPreview";
@@ -15,10 +15,15 @@ export default function Home() {
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [playback, setPlayback] = useState<Recording | null>(null);
   const [tipsOpen, setTipsOpen] = useState(false);
-  const { state, elapsed, start, stop, lastRecording } = useRecorder();
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+
+  const { state, elapsed, start, stop, lastRecording, canStop } =
+    useRecorder(cameraStream);
 
   useEffect(() => {
-    setRecordings(getRecordings());
+    // Blob URLs are tied to the current document — they're invalid after any
+    // page reload, so wipe storage on mount and start fresh every session.
+    clearRecordings();
   }, []);
 
   useEffect(() => {
@@ -42,20 +47,39 @@ export default function Home() {
         </button>
       </header>
 
-      <div className="max-w-xl mx-auto px-6 py-8 flex flex-col gap-6">
-        <PromptBanner />
-
-        <div className="flex gap-4 items-stretch">
-          <CameraPreview />
-          <RecordingControls
-            state={state}
-            elapsed={elapsed}
-            onStart={start}
-            onStop={stop}
-          />
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-8 px-8 py-8 items-start">
+        {/* Left — session history */}
+        <div className="pt-1">
+          <SessionHistory recordings={recordings} onPlay={setPlayback} />
         </div>
 
-        <SessionHistory recordings={recordings} onPlay={setPlayback} />
+        {/* Center — recording */}
+        <div className="flex flex-col gap-5 w-[440px]">
+          <PromptBanner />
+          <div className="flex gap-4 items-stretch">
+            <CameraPreview
+              onStreamChange={setCameraStream}
+              disabled={state === "recording"}
+            />
+            <RecordingControls
+              state={state}
+              elapsed={elapsed}
+              canStop={canStop}
+              onStart={start}
+              onStop={stop}
+            />
+          </div>
+        </div>
+
+        {/* Right — about */}
+        <div className="pt-1">
+          <p className="text-xs text-[#555] leading-relaxed">
+            <span className="text-[#888] font-medium">talktoyourself</span> was
+            designed to give you a place to practice speaking — whether
+            it&apos;s for interviews, presentations, or just talking to others
+            in general.
+          </p>
+        </div>
       </div>
 
       {playback && (

@@ -3,6 +3,5 @@ export type Recording = {
   timestamp: number;
   duration: number;
   blobUrl: string;
-  fillerCount: number;
-  transcript: string;
+  hasVideo?: boolean;
 };

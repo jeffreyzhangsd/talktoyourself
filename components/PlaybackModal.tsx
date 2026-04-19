@@ -47,42 +47,28 @@ export default function PlaybackModal({ recording, onClose }: Props) {
           </button>
         </div>
 
-        <audio
-          src={recording.blobUrl}
-          controls
-          className="w-full"
-          style={{ colorScheme: "dark" }}
-        />
+        {recording.hasVideo ? (
+          <video
+            src={recording.blobUrl}
+            controls
+            className="w-full rounded-lg"
+            style={{ colorScheme: "dark" }}
+          />
+        ) : (
+          <audio
+            src={recording.blobUrl}
+            controls
+            className="w-full"
+            style={{ colorScheme: "dark" }}
+          />
+        )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#1a1a1a] rounded-lg p-3">
-            <div className="text-xs text-[#555] mb-1">DURATION</div>
-            <div className="text-xl font-bold text-white">
-              {formatTime(recording.duration)}
-            </div>
-          </div>
-          <div className="bg-[#1a1a1a] rounded-lg p-3">
-            <div className="text-xs text-[#555] mb-1">FILLER WORDS</div>
-            <div className="text-xl font-bold text-white">
-              {recording.fillerCount}
-            </div>
+        <div className="bg-[#1a1a1a] rounded-lg p-3">
+          <div className="text-xs text-[#555] mb-1">DURATION</div>
+          <div className="text-xl font-bold text-white">
+            {formatTime(recording.duration)}
           </div>
         </div>
-
-        {recording.fillerCount > 0 && (
-          <p className="text-xs text-[#555] italic">
-            * Filler word detection uses Web Speech API — accuracy may vary.
-          </p>
-        )}
-
-        {recording.transcript && (
-          <div className="bg-[#1a1a1a] rounded-lg p-3">
-            <div className="text-xs text-[#555] mb-2">TRANSCRIPT</div>
-            <p className="text-sm text-[#888] leading-relaxed">
-              {recording.transcript}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
