@@ -74,9 +74,10 @@ export default function Home() {
         {/* Right — about */}
         <div className="pt-1">
           <p className="text-xs text-[#555] leading-relaxed">
-            <span className="text-[#888] font-medium">talktoyourself</span> was
-            designed to give you a place to practice speaking, whether it&apos;s
-            for interviews, presentations, or just talking to others in general.
+            <span className="text-[#888] font-medium">talktoyourself</span>
+            {
+              " was designed to give you a place to practice speaking, whether it's for interviews, presentations, or just talking to others in general."
+            }
           </p>
         </div>
       </div>
